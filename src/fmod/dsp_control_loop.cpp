@@ -61,7 +61,25 @@ void ControlLoop::run(const std::stop_token& tok) {
 
     int discovery_attempts = 0;
 
+    // Keep draining the active source into the ring even before we have a
+    // DSP target, and keep the ring itself drained too. A source that starts
+    // streaming immediately at startup (e.g. OocRadioSource's ffmpeg pull)
+    // otherwise fills its output pipe within seconds with nothing reading
+    // it, which blocks ffmpeg and stalls its network read for as long as
+    // discovery takes (observed: several minutes) -- so playback starts
+    // that far behind live once draining finally resumes, instead of at the
+    // live edge. Draining the ring on top of pumping it matters just as
+    // much: with no DSP yet reading from it, the ring itself fills within
+    // its own ~20s capacity and pump() stops accepting new data once it's
+    // full, which reproduces the exact same stall one layer up.
+    auto pump_and_drain = [this] {
+        bridge_.manager().pump_once();
+        bridge_.manager().ring().drain();
+    };
+
     while (!tok.stop_requested()) {
+        pump_and_drain();
+
         if (acquire_target()) {
             break;
         }
@@ -75,8 +93,10 @@ void ControlLoop::run(const std::stop_token& tok) {
         }
 
         for (auto t = std::chrono::steady_clock::now() + kDiscoveryRetry;
-             std::chrono::steady_clock::now() < t && !tok.stop_requested();)
+             std::chrono::steady_clock::now() < t && !tok.stop_requested();) {
+            pump_and_drain();
             std::this_thread::sleep_for(kTick);
+        }
     }
 
     if (tok.stop_requested()) return;
@@ -95,6 +115,15 @@ void ControlLoop::run(const std::stop_token& tok) {
         next += kTick;
         bridge_.retarget_if_needed();
         bridge_.manager().pump_once();
+
+        // Same protection as the initial discovery loop, for the same
+        // reason: whenever nothing is actually reading PCM out of the ring
+        // (pause menu, tuned away to a different station, a torn-down
+        // channel awaiting retune), draining it here keeps pump() able to
+        // keep accepting fresh data from the source indefinitely, instead
+        // of the ring filling, pump() stalling, and the source's own
+        // pipe/network read backing up right along with it.
+        if (!radio_audible_) bridge_.manager().ring().drain();
 
         bridge_.set_mode(DSPMode::pcm);
 
@@ -235,21 +264,28 @@ bool ControlLoop::acquire_target() noexcept {
     return true;
 }
 
-// Only ever matches the real Streamer Mode placeholder station -- never
-// falls back to an arbitrary instance. Returning nullptr when Streamer Mode
-// is off (so the placeholder doesn't exist) means acquire_target() simply
-// fails and native FH6 stations are left completely untouched.
+// The Streamer Mode slot doesn't always carry the fixed kTargetSoundName --
+// FH6 can load other tracks into it (observed: real tracks from station R8's
+// rotation), so a SoundName match isn't a reliable signal on every game
+// build. What IS reliable is the game's own "currently selected station"
+// state (game_state_.on_target_station, read via a separate chain off
+// radio_state) -- it's only ever true while Streamer Mode's slot is
+// selected, never for a real native station, so gating on it is what keeps
+// native stations safe from PCM override without depending on a specific
+// track name.
 const RadioInstance* ControlLoop::select_instance(const DiscoveryResult& disc) const noexcept {
-    const RadioInstance* target = nullptr; // first placeholder-named match, any handle state
+    if (disc.instances.empty() || !game_state_.read().on_target_station) return nullptr;
+
+    // Prefer an exact placeholder-name match if one happens to be present,
+    // then whichever instance's channel is actually alive (carrying audio).
     for (const auto& i : disc.instances) {
-        if (i.sound_name != kTargetSoundName) continue;
-        // FH6 can spin up several streams sharing the placeholder name (e.g.
-        // an idle secondary mix); prefer the one whose channel is actually
-        // live so we attach to the stream that's carrying audio.
-        if (bridge_.channel_handle_alive(i.radio_stream)) return &i;
-        if (!target) target = &i;
+        if (i.sound_name == kTargetSoundName && bridge_.channel_handle_alive(i.radio_stream))
+            return &i;
     }
-    return target;
+    for (const auto& i : disc.instances) {
+        if (bridge_.channel_handle_alive(i.radio_stream)) return &i;
+    }
+    return &disc.instances.front();
 }
 
 void ControlLoop::run_playback_state_machines(time_point now) noexcept {
