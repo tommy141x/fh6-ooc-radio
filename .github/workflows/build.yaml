@@ -1,0 +1,23 @@
+name: Build
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Build distribution into dist/
+        run: .\scripts\build.ps1
+
+      - name: Upload distribution
+        uses: actions/upload-artifact@v7
+        with:
+          name: ooc-radio-fh6
+          path: dist/

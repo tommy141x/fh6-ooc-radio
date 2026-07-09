@@ -1,0 +1,39 @@
+# Example config, copied to `<game>/fh6-radio/config.toml` on first install.
+# There is no dashboard for this mod -- everything is hand-edited here.
+# Windows paths should use TOML literal strings (single quotes) so backslashes
+# pass through verbatim, e.g. ffmpeg_path = 'C:\tools\ffmpeg.exe'.
+
+[general]
+ring_buffer_mb = 4
+default_source = "ooc_radio"
+ffmpeg_path    = ''    # blank = auto-download to fh6-radio/bin (else `ffmpeg` on PATH)
+
+[ooc_radio]
+enabled = true
+# Generate a key on the OOC Radio developer dashboard (https://radio.oocradio.com/),
+# "Developer" section -> "Create a new key". Looks like "oocr_live_...".
+# Keep this file out of any repo/commit once a real key is in it.
+api_key = ''
+
+[audio]
+output_gain = 1.0
+
+[playback]
+race_start_playback  = "next"      # "next" | "restart" | "ignore" | "off" -- action when a race begins
+volume_normalization = false       # apply loudnorm to the stream when on
+equalizer_enabled    = false
+equalizer_bands      = [0.0, 0.0, 0.0, 0.0, 0.0]   # 60/250/1000/4000/12000 Hz, [-6, +6] dB
+force_stereo_audio   = true        # off => mono (avoids metallic phase-cancellation on the 3D radio channel)
+prebuffer_next_track = true        # pre-spawn the next track's pipeline so transitions skip the "(loading)" gap
+
+[hotkeys]
+kb_skip       = 0           # keyboard virtual key code to skip track (0 = unbound)
+pad_skip      = 0           # XInput controller button mask to skip track (0 = unbound)
+kb_source     = 0           # unused (only one source); left for hotkey-table compatibility
+pad_source    = 0
+kb_playpause  = 0           # keyboard virtual key code to play/pause (0 = unbound)
+pad_playpause = 0           # XInput controller button mask to play/pause (0 = unbound)
+kb_prev       = 0           # keyboard virtual key code to go to previous track (0 = unbound)
+pad_prev      = 0           # XInput controller button mask to go to previous track (0 = unbound)
+kb_next_station = 0         # unused (only one station); left for hotkey-table compatibility
+pad_next_station = 0

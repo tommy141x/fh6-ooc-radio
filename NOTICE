@@ -1,0 +1,27 @@
+OOC Radio for FH6
+=================
+
+This project is a derivative work licensed under the GNU General Public
+License v3.0 (see LICENSE). It is a stripped-down fork, single-purpose
+mod: it plays only the "Out of Character Radio" stream and has no web
+dashboard.
+
+Attribution chain:
+
+  - Forked from "FH6 Universal Radio" by g0ldyy
+    (https://github.com/g0ldyy/fh6-universal-radio), GPLv3.
+    Thanks also to @odexine (https://github.com/de-odex) for that
+    project's Local Files playback work, carried in via the shared
+    proxy/FMOD/DX12 plumbing this fork retains.
+
+  - fh6-universal-radio was itself inspired by "Big John"'s
+    closed-source FH6 Spotify radio mod (an unrelated, separately
+    licensed project -- no code or implementation details from that
+    mod are included here).
+
+What changed in this fork: removed the local files/Spotify/YouTube
+Music/Jellyfin/external-audio/vanilla-passthrough sources, removed the
+HTTP dashboard and bundled web UI entirely, and added a single
+hardcoded "OOC Radio" source that streams radio.oocradio.com and polls
+api.oocradio.com/v1 for now-playing/live-presenter metadata shown
+in-game.
