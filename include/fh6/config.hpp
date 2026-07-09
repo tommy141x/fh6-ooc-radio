@@ -47,7 +47,7 @@ struct AudioConfig {
 // api.oocradio.com/v1 metadata poll for now-playing/live-presenter info.
 struct OocRadioConfig {
     bool enabled = true;
-    std::string api_key; // "oocr_live_..." from https://radio.oocradio.com/ developer page
+    std::string api_key; // "oocr_live_..." from https://oocradio.com/ developer page
 };
 
 struct Config {

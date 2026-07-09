@@ -1,9 +1,10 @@
-# Downloads the three single-header dependencies into third_party/.
-# Run this once after cloning the project, before configuring CMake.
+# Downloads the third_party/ dependencies fresh from upstream.
 #
 #   PS> .\scripts\get-deps.ps1
 #
-# Re-runs are safe -- existing files are overwritten.
+# third_party/ is committed to the repo, so a normal clone + build.ps1 never
+# needs this script. Only run it to pull in upstream updates -- re-runs are
+# safe, existing files are overwritten.
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent $PSScriptRoot

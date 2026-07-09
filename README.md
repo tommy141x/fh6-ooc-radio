@@ -6,7 +6,7 @@
 
 <p align="center">
   An in-game-only <a href="https://en.wikipedia.org/wiki/Forza_Horizon_6">Forza Horizon 6</a> radio mod that streams
-  <a href="https://radio.oocradio.com/">Out of Character Radio</a> straight onto the radio dial.
+  <a href="https://oocradio.com/">Out of Character Radio</a> straight onto the radio dial.
 </p>
 
 <p align="center">
@@ -41,7 +41,7 @@ a single-purpose mod. Everything is configured by hand-editing one
 
 ## Install
 
-1. **Get an API key.** Open <https://radio.oocradio.com/>, go to
+1. **Get an API key.** Open <https://oocradio.com/>, go to
    **Developer**, and create a key (looks like `oocr_live_...`).
 2. **Download the latest release** from the
    [Releases](https://github.com/tommy141x/fh6-ooc-radio/releases) page.

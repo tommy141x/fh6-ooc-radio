@@ -2,9 +2,5 @@
 build/
 /dist/
 
-# Downloaded by scripts\get-deps.ps1
-third_party/
-include/stb
-
 # Never commit a real config with an API key in it
 config.toml

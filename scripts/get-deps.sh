@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Downloads the three single-header dependencies into third_party/.
-# Run this once after cloning, before configuring CMake.
+# Downloads the third_party/ dependencies fresh from upstream.
 #
 #   $ scripts/get-deps.sh
 #
-# Re-runs are safe, existing files are overwritten.
+# third_party/ is committed to the repo, so a normal clone + build.sh never
+# needs this script. Only run it to pull in upstream updates -- re-runs are
+# safe, existing files are overwritten.
 
 set -euo pipefail
 

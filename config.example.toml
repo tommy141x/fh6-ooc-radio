@@ -10,7 +10,7 @@ ffmpeg_path    = ''    # blank = auto-download to fh6-radio/bin (else `ffmpeg` o
 
 [ooc_radio]
 enabled = true
-# Generate a key on the OOC Radio developer dashboard (https://radio.oocradio.com/),
+# Generate a key on the OOC Radio developer dashboard (https://oocradio.com/),
 # "Developer" section -> "Create a new key". Looks like "oocr_live_...".
 # Keep this file out of any repo/commit once a real key is in it.
 api_key = ''

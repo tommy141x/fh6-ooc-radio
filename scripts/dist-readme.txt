@@ -30,7 +30,7 @@ and re-extract.
 
 Next, open fh6-radio\config.toml in a text editor and paste your OOC
 Radio API key into the api_key field under [ooc_radio]. Generate one
-from the "Developer" section of https://radio.oocradio.com/ if you
+from the "Developer" section of https://oocradio.com/ if you
 don't have one yet. Without a key, the stream still plays but title/
 artist/live-presenter info won't show.
 
